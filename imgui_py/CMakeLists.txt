@@ -41,9 +41,9 @@ swig_add_library(imgui_py
         imgui/misc/cpp/imgui_stdlib.cpp
         DearImGuiApp.cpp
         DearImGuiApp.h)
-target_link_libraries(imgui_py PUBLIC Python3::Python OpenGL::OpenGL ${SDL_LIBRARIES})
+target_link_libraries(imgui_py PUBLIC Python3::Python OpenGL::OpenGL ${SDL2_LIBRARIES})
 target_include_directories(imgui_py PUBLIC
-    ${SDL_INCLUDE_DIRS}
+    ${SDL2_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/imgui
     ${CMAKE_CURRENT_SOURCE_DIR}/imgui/backends
