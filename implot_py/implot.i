@@ -6,6 +6,7 @@
 #include "implot.h"
 #include "implot_internal.h"
 #include "numpy/arrayobject.h"
+#include "implot_extra.h"
 %}
 
 %rename("%(undercase)s", match$kind="function") "";
@@ -166,9 +167,6 @@ plt = get_current_plot()
 _implot_py._dec_ref_axis_formatter_all(plt)
 %}
 
-%include "../imconfig.h"
-%include "implot.h"
-
 %ignore ImPlot::PlotLine;
 %ignore ImPlot::PlotLineG;
 %ignore ImPlot::PlotScatter;
@@ -191,98 +189,54 @@ _implot_py._dec_ref_axis_formatter_all(plt)
 %ignore ImPlot::PlotDigitalG;
 %ignore ImPlot::PlotImage;
 
-%define IMPLOT_TYPE_INSTANTIATIONS(T)
-%inline %{
-void PlotLine(const char* label_id, const T* values, int count, double xscale=1, double xstart=0, ImPlotLineFlags flags=0, int offset=0)
-{ ImPlot::PlotLine(label_id, values, count, xscale, xstart, flags, offset); }
-void PlotLineXY(const char* label_id, const T* xs, int xs_count, const T* ys, int ys_count, ImPlotLineFlags flags=0, int offset=0)
-{ assert(xs_count == ys_count); ImPlot::PlotLine(label_id, xs, ys, xs_count, flags, offset); }
+%include "../imconfig.h"
+%include "implot.h"
+%include "implot_extra.h"
 
-void PlotScatter(const char* label_id, const T* values, int count, double xscale=1, double xstart=0, ImPlotScatterFlags flags=0, int offset=0)
-{ ImPlot::PlotScatter(label_id, values, count, xscale, xstart, flags, offset); }
-void PlotScatterXY(const char* label_id, const T* xs, int xs_count, const T* ys, int ys_count, ImPlotScatterFlags flags=0, int offset=0)
-{ assert(xs_count == ys_count); ImPlot::PlotScatter(label_id, xs, ys, ys_count, flags, offset); }
-
-void PlotStairs(const char* label_id, const T* values, int count, double xscale=1, double xstart=0, ImPlotStairsFlags flags=0, int offset=0)
-{ ImPlot::PlotStairs(label_id, values, count, xscale, xstart, flags, offset); }
-void PlotStairsXY(const char* label_id, const T* xs, int xs_count, const T* ys, int ys_count, ImPlotStairsFlags flags=0, int offset=0)
-{ assert(xs_count == ys_count); ImPlot::PlotStairs(label_id, xs, ys, ys_count, flags, offset); }
-
-void PlotShaded(const char* label_id, const T* values, int count, double yref=0, double xscale=1, double xstart=0, ImPlotShadedFlags flags=0, int offset=0)
-{ ImPlot::PlotShaded(label_id, values, count, yref, xscale, xstart, flags, offset); }
-void PlotShadedXY(const char* label_id, const T* xs, int xs_count, const T* ys, int ys_count, double yref=0, ImPlotShadedFlags flags=0, int offset=0)
-{ assert(xs_count == ys_count); ImPlot::PlotShaded(label_id, xs, ys, ys_count, yref, flags, offset); }
-void PlotShadedXYY(const char* label_id, const T* xs, int xs_count, const T* ys1, int ys1_count, const T* ys2, int ys2_count, ImPlotShadedFlags flags=0, int offset=0)
-{ assert(xs_count == ys1_count); assert(xs_count == ys2_count); ImPlot::PlotShaded(label_id, xs, ys1, ys2, xs_count, flags, offset); }
-
-void PlotBars(const char* label_id, const T* values, int count, double bar_size=0.67, double shift=0, ImPlotBarsFlags flags=0, int offset=0)
-{ ImPlot::PlotBars(label_id, values, count, bar_size, shift, flags, offset); }
-void PlotBarsXY(const char* label_id, const T* xs, int xs_count, const T* ys, int ys_count, double bar_size, ImPlotBarsFlags flags=0, int offset=0)
-{ assert(xs_count == ys_count); ImPlot::PlotBars(label_id, xs, ys, ys_count, bar_size, flags, offset); }
-
-//void PlotBarGroups(const char* const label_ids[], const T* values, int item_count, int group_count, double group_size=0.67, double shift=0, ImPlotBarGroupsFlags flags=0);
-
-void PlotErrorBars(const char* label_id, const T* xs, int xs_count, const T* ys, int ys_count, const T* err, int err_count, ImPlotErrorBarsFlags flags=0, int offset=0)
-{ assert(xs_count == ys_count); assert(xs_count == err_count); ImPlot::PlotErrorBars(label_id, xs, ys, err, ys_count, flags, offset); }
-void PlotErrorBars2(const char* label_id, const T* xs, int xs_count, const T* ys, int ys_count, const T* neg, int neg_count, const T* pos, int pos_count, ImPlotErrorBarsFlags flags=0, int offset=0)
-{ assert(xs_count == ys_count); assert(xs_count == neg_count); assert(xs_count == pos_count); ImPlot::PlotErrorBars(label_id, xs, ys, neg, pos, pos_count, flags, offset); }
-
-void PlotStems(const char* label_id, const T* values, int count, double ref=0, double scale=1, double start=0, ImPlotStemsFlags flags=0, int offset=0)
-{ ImPlot::PlotStems(label_id, values, count, ref, scale, start, flags, offset); }
-void PlotStemsXY(const char* label_id, const T* xs, int xs_count, const T* ys, int ys_count, double ref=0, ImPlotStemsFlags flags=0, int offset=0)
-{ assert(xs_count == ys_count); ImPlot::PlotStems(label_id, xs, ys, ys_count, ref, flags, offset); }
-
-void PlotInfLines(const char* label_id, const T* values, int count, ImPlotInfLinesFlags flags=0, int offset=0)
-{ ImPlot::PlotInfLines(label_id, values, count, flags, offset); }
-
-//IMPLOT_TMP void PlotPieChart(const char* const label_ids[], const T* values, int count, double x, double y, double radius, const char* label_fmt="%.1f", double angle0=90, ImPlotPieChartFlags flags=0);
-
-void PlotHeatmap(const char* label_id, const T* values, int count, int rows, int cols, double scale_min=0, double scale_max=0, const char* label_fmt="%.1f", const ImPlotPoint* bounds_min=0, const ImPlotPoint* bounds_max=0, ImPlotHeatmapFlags flags=0)
-{
-    assert(count == rows * cols);
-    ImPlotPoint bounds_min_default(0,0);
-    ImPlotPoint bounds_max_default(1,1);
-    if (bounds_min == 0)
-        bounds_min = &bounds_min_default;
-    if (bounds_max == 0)
-        bounds_max = &bounds_max_default;
-    ImPlot::PlotHeatmap(label_id, values, rows, cols, scale_min, scale_max, label_fmt, *bounds_min, *bounds_max, flags);
-}
-
-double PlotHistogram(const char* label_id, const T* values, int count, int bins=ImPlotBin_Sturges, double bar_scale=1.0, const ImPlotRange* range=0, ImPlotHistogramFlags flags=0)
-{
-    const ImPlotRange range_default;
-    if (range == 0)
-        range = &range_default;
-    return ImPlot::PlotHistogram(label_id, values, count, bins, bar_scale, *range, flags);
-}
-
-double PlotHistogram2D(const char* label_id, const T* xs, int xs_count, const T* ys, int ys_count, int x_bins=ImPlotBin_Sturges, int y_bins=ImPlotBin_Sturges, const ImPlotRect* range=0, ImPlotHistogramFlags flags=0)
-{
-    assert(xs_count == ys_count);
-    const ImPlotRect range_default;
-    if (range == 0)
-        range = &range_default;
-    return ImPlot::PlotHistogram2D(label_id, xs, ys, ys_count, x_bins, y_bins, *range, flags);
-}
-
-void PlotDigital(const char* label_id, const T* xs, int xs_count, const T* ys, int ys_count, ImPlotDigitalFlags flags=0, int offset=0)
-{ ImPlot::PlotDigital(label_id, xs, ys, ys_count, flags, offset); }
-
-//IMPLOT_API void PlotImage(const char* label_id, ImTextureID user_texture_id, const ImPlotPoint& bounds_min, const ImPlotPoint& bounds_max, const ImVec2& uv0=ImVec2(0,0), const ImVec2& uv1=ImVec2(1,1), const ImVec4& tint_col=ImVec4(1,1,1,1), ImPlotImageFlags flags=0);
+#define QUOTE(str) #str
+#define EXPAND_AND_QUOTE(str) QUOTE(str)
+%define PLOT_TYPE_INSTANTIATIONS(PlotFuncName, BaseName, targn)
+%rename(BaseName ## _int8) PlotFuncName<signed char>;
+%template() PlotFuncName<signed char>;
+%rename(BaseName ## _int16) PlotFuncName<signed short>;
+%template() PlotFuncName<signed short>;
+%rename(BaseName ## _int32) PlotFuncName<signed int>;
+%template() PlotFuncName<signed int>;
+%rename(BaseName ## _int64) PlotFuncName<signed long long>;
+%template() PlotFuncName<signed long long>;
+%rename(BaseName ## _uint8) PlotFuncName<unsigned char>;
+%template() PlotFuncName<unsigned char>;
+%rename(BaseName ## _uint16) PlotFuncName<unsigned short>;
+%template() PlotFuncName<unsigned short>;
+%rename(BaseName ## _uint32) PlotFuncName<unsigned int>;
+%template() PlotFuncName<unsigned int>;
+%rename(BaseName ## _uint64) PlotFuncName<unsigned long long>;
+%template() PlotFuncName<unsigned long long>;
+%rename(BaseName ## _float32) PlotFuncName<float>;
+%template() PlotFuncName<float>;
+%rename(BaseName ## _float64) PlotFuncName<double>;
+%template() PlotFuncName<double>;
+%pythonbegin
+%{
+def BaseName(*args, **kwargs):
+    return globals()[EXPAND_AND_QUOTE(BaseName) + f'_{args[targn].dtype.name}'](*args, **kwargs)
 %}
 %enddef
 
-IMPLOT_TYPE_INSTANTIATIONS(signed char);
-IMPLOT_TYPE_INSTANTIATIONS(signed short);
-IMPLOT_TYPE_INSTANTIATIONS(signed int);
-IMPLOT_TYPE_INSTANTIATIONS(signed long long);
-IMPLOT_TYPE_INSTANTIATIONS(unsigned char);
-IMPLOT_TYPE_INSTANTIATIONS(unsigned short);
-IMPLOT_TYPE_INSTANTIATIONS(unsigned int);
-IMPLOT_TYPE_INSTANTIATIONS(unsigned long long);
-IMPLOT_TYPE_INSTANTIATIONS(float);
-IMPLOT_TYPE_INSTANTIATIONS(double);
+PLOT_TYPE_INSTANTIATIONS(PlotLine, plot_line, 1);
+PLOT_TYPE_INSTANTIATIONS(PlotScatter, plot_scatter, 1);
+PLOT_TYPE_INSTANTIATIONS(PlotStairs, plot_stairs, 1);
+PLOT_TYPE_INSTANTIATIONS(PlotShaded, plot_shaded, 1);
+PLOT_TYPE_INSTANTIATIONS(PlotBars, plot_bars, 1);
+PLOT_TYPE_INSTANTIATIONS(PlotStems, plot_stems, 1);
+PLOT_TYPE_INSTANTIATIONS(PlotLineXY, plot_line_xy, 1);
+PLOT_TYPE_INSTANTIATIONS(PlotScatterXY, plot_scatter_xy, 1);
+PLOT_TYPE_INSTANTIATIONS(PlotStairsXY, plot_stairs_xy, 1);
+PLOT_TYPE_INSTANTIATIONS(PlotShadedXY, plot_shaded_xy, 1);
+PLOT_TYPE_INSTANTIATIONS(PlotBarsXY, plot_bars_xy, 1);
+PLOT_TYPE_INSTANTIATIONS(PlotStemsXY, plot_stems_xy, 1);
+PLOT_TYPE_INSTANTIATIONS(PlotDigitalXY, plot_digital_xy, 1);
+PLOT_TYPE_INSTANTIATIONS(ImPlot::PlotHistogram2D, plot_histogram_2d, 1);
 
 %ignore ImPlotContext::Plots;
 %ignore ImPlotContext::Subplots;
