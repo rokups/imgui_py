@@ -149,8 +149,17 @@ bool InputText(const char* label, std::string& buf, ImGuiInputTextFlags flags = 
 {
 	return ImGui::InputText(label, &buf, flags);
 }
-//bool InputTextMultiline(const char* label, char* buf, size_t buf_size, const ImVec2& size = ImVec2(0, 0), ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = NULL, void* user_data = NULL);
-//bool InputTextWithHint(const char* label, const char* hint, char* buf, size_t buf_size, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = NULL, void* user_data = NULL);
+bool InputTextMultiline(const char* label, std::string& buf, const ImVec2* size = 0, ImGuiInputTextFlags flags = 0)
+{
+	const ImVec2 default_size(0, 0);
+	if (size == 0)
+		size = &default_size;
+	return ImGui::InputTextMultiline(label, &buf, *size, flags);
+}
+bool InputTextWithHint(const char* label, const char* hint, std::string& buf, ImGuiInputTextFlags flags = 0)
+{
+	return ImGui::InputTextWithHint(label, hint, &buf, flags);
+}
 %}
 /// endregion
 
