@@ -10,7 +10,7 @@
 #endif
 #include "DearImGuiApp.h"
 
-DearImGuiApp::DearImGuiApp(const char* title, int width, int height)
+DearImGuiApp::DearImGuiApp(const char* title, int width, int height, int x, int y)
 {
     // Setup SDL
     // (Some versions of SDL before <2.0.10 appears to have performance/stalling issues on a minority of Windows systems,
@@ -22,8 +22,10 @@ DearImGuiApp::DearImGuiApp(const char* title, int width, int height)
     }
 
     Title = title;
-    width = width ? width : 1280;
-    height = height ? height : 720;
+    Width = width ? width : 1280;
+    Height = height ? height : 720;
+    X = x == INT32_MAX ? SDL_WINDOWPOS_CENTERED : x;
+    Y = y == INT32_MAX ? SDL_WINDOWPOS_CENTERED : y;
 
     // Decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
@@ -54,7 +56,7 @@ DearImGuiApp::DearImGuiApp(const char* title, int width, int height)
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-    Window = SDL_CreateWindow(Title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, window_flags);
+    Window = SDL_CreateWindow(Title.c_str(), X, Y, Width, Height, window_flags);
     GlContext = SDL_GL_CreateContext(Window);
     SDL_GL_MakeCurrent(Window, GlContext);
     SDL_GL_SetSwapInterval(1); // Enable vsync
@@ -104,8 +106,21 @@ bool DearImGuiApp::BeginFrame()
         ImGui_ImplSDL2_ProcessEvent(&event);
         if (event.type == SDL_QUIT)
             return false;
-        if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(Window))
-            return false;
+        if (event.type == SDL_WINDOWEVENT && event.window.windowID == SDL_GetWindowID(Window))
+        {
+            if (event.window.event == SDL_WINDOWEVENT_CLOSE)
+                return false;
+            else if (event.window.event == SDL_WINDOWEVENT_MOVED)
+            {
+                X = event.window.data1;
+                Y = event.window.data2;
+            }
+            else if (event.window.event == SDL_WINDOWEVENT_RESIZED)
+            {
+                Width = event.window.data1;
+                Height = event.window.data2;
+            }
+        }
     }
 
     // Start the Dear ImGui frame
