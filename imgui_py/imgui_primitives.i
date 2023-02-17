@@ -2,14 +2,18 @@
 import sys
 import math
 from collections import namedtuple
+from dataclasses import dataclass
+import dataclasses
+from typing import Union
 imgui = sys.modules[__name__]
-__ImVec2__ = namedtuple('ImVec2', ['x', 'y'])
-ImVec4 = namedtuple('ImVec4', ['x', 'y', 'z', 'w'])
-__ImColor__ = namedtuple('ImColor', ['r', 'g', 'b', 'a'])
-__ImRect__ = namedtuple('ImRect', ['min', 'max'])
 
+@dataclass(slots=True)
+class ImColor:
+    r: float = 0.0
+    g: float = 0.0
+    b: float = 0.0
+    a: float = 0.0
 
-class ImColor(__ImColor__):
     @property
     def u32(self):
         out  = (int(self.r * 255.0 + 0.5)) << 0
@@ -18,24 +22,63 @@ class ImColor(__ImColor__):
         out |= (int(self.a * 255.0 + 0.5)) << 24
         return out
 
+    def copy(self):
+        return dataclasses.replace(self)
 
-class ImVec2(__ImVec2__):
-    #def __init__(self, x=0.0, y=0.0):
-    #    self.x = x
-    #    self.y = y
-    #
-    #def __iter__(self):
-    #    return iter((self.x, self.y))
+    def __iter__(self):
+        return iter((self.r, self.g, self.b, self.a))
+
+    def __getitem__(self, i):
+        return getattr(self, self.__slots__[i])
+
+    def __setitem__(self, i, value):
+        return setattr(self, self.__slots__[i], value)
+
+    def __len__(self):
+        return 4
+
+    def __reversed__(self):
+        return reversed(self.__iter__())
+
+    def __contains__(self, value):
+        return value in self.__iter__()
+
+
+@dataclass(slots=True)
+class ImVec2:
+    x: float = 0.0
+    y: float = 0.0
 
     @property
     def length(self):
         return math.sqrt((self.x * self.x) + (self.y * self.y))
 
     def normalize(self):
-        l = self.length
-        if l > 0:
-            return ImVec2(self.x / l, self.y / l)
+        length = self.length
+        if length > 0:
+            return ImVec2(self.x / length, self.y / length)
         return ImVec2(0, 0)
+
+    def copy(self):
+        return dataclasses.replace(self)
+
+    def __iter__(self):
+        return iter((self.x, self.y))
+
+    def __getitem__(self, i):
+        return getattr(self, self.__slots__[i])
+
+    def __setitem__(self, i, value):
+        return setattr(self, self.__slots__[i], value)
+
+    def __len__(self):
+        return 2
+
+    def __reversed__(self):
+        return reversed(self.__iter__())
+
+    def __contains__(self, value):
+        return value in self.__iter__()
 
     def __add__(self, rhs):
         if isinstance(rhs, (float, int)):
@@ -52,7 +95,7 @@ class ImVec2(__ImVec2__):
             return ImVec2(self.x / rhs, self.y / rhs)
         return ImVec2(self.x / rhs.x, self.y / rhs.y)
 
-    def __mul__(self, rhs):
+    def __mul__(self, rhs: Union['ImVec2', float, int]):
         if isinstance(rhs, (float, int)):
             return ImVec2(self.x * rhs, self.y * rhs)
         return ImVec2(self.x * rhs.x, self.y * rhs.y)
@@ -61,38 +104,50 @@ class ImVec2(__ImVec2__):
         return ImVec2(abs(self.x), abs(self.y))
 
 
-#class ImVec4(object):
-#    def __init__(self, x=0.0, y=0.0, z=0.0, w=0.0):
-#        self.x = x
-#        self.y = y
-#        self.z = z
-#        self.w = w
-#
-#    def __iter__(self):
-#        return iter((self.x, self.y, self.z, self.w))
-#
-#
-#class ImColor(object):
-#    def __init__(self, r=0.0, g=0.0, b=0.0, a=0.0):
-#        self.r = r
-#        self.g = g
-#        self.b = b
-#        self.a = a
-#
-#    def __iter__(self):
-#        return iter((self.r, self.g, self.b, self.a))
+@dataclass(slots=True)
+class ImVec4:
+    x: float = 0.0
+    y: float = 0.0
+    z: float = 0.0
+    w: float = 0.0
+
+    def copy(self):
+        return dataclasses.replace(self)
+
+    def __iter__(self):
+        return iter((self.x, self.y, self.z, self.w))
+
+    def __getitem__(self, i):
+        return getattr(self, self.__slots__[i])
+
+    def __setitem__(self, i, value):
+        return setattr(self, self.__slots__[i], value)
+
+    def __len__(self):
+        return 4
+
+    def __reversed__(self):
+        return reversed(self.__iter__())
+
+    def __contains__(self, value):
+        return value in self.__iter__()
 
 
-class ImRect(__ImRect__):
-    #def __init__(self, min=None, max=None):
-    #    self.min = min if min is not None else ImVec2(0.0, 0.0)
-    #    self.max = max if max is not None else ImVec2(0.0, 0.0)
-    #
-    #def __iter__(self):
-    #    return iter((self.min, self.max))
+@dataclass(slots=True)
+class ImRect:
+    min: ImVec2 = ImVec2()
+    max: ImVec2 = ImVec2()
 
     def contains(self, pos: ImVec2):
         return self.min.x <= pos.x <= self.max.x and self.min.y <= pos.y <= self.max.y
+
+    def expand(self, size):
+        if isinstance(size, float):
+            size = ImVec2(size, size)
+        return ImRect(self.min - size, self.max + size)
+
+    def copy(self):
+        return dataclasses.replace(self)
 
     @property
     def center(self):
@@ -130,15 +185,27 @@ class ImRect(__ImRect__):
     def br(self):
         return self.max
 
+    def __iter__(self):
+        return iter((self.min, self.max))
+
+    def __getitem__(self, i):
+        return getattr(self, self.__slots__[i])
+
+    def __setitem__(self, i, value):
+        return setattr(self, self.__slots__[i], value)
+
+    def __len__(self):
+        return 2
+
+    def __reversed__(self):
+        return reversed(self.__iter__())
+
+    def __contains__(self, value):
+        return value in self.__iter__()
+
     def __mul__(self, rhs):
         assert isinstance(rhs, (float, int))
         return ImRect(self.min * rhs, self.max * rhs)
-
-    def expand(self, size):
-        if isinstance(size, float):
-            size = ImVec2(size, size)
-        return ImRect(self.min - size, self.max + size)
-
 %}
 
 %fragment("PySequenceHelpers", "header") {
