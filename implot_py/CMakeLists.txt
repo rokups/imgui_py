@@ -25,6 +25,7 @@ set(CMAKE_SWIG_FLAGS
 swig_add_library(implot_py
     TYPE SHARED
     LANGUAGE Python
+	OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
     OUTFILE_DIR ${CMAKE_CURRENT_BINARY_DIR}
     SOURCES
         implot/implot.cpp
@@ -40,4 +41,4 @@ target_include_directories(implot_py PUBLIC
 target_compile_definitions(implot_py PUBLIC NPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION)
 
 install(TARGETS implot_py LIBRARY DESTINATION .)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/implot.py DESTINATION .)
+install(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/implot.py DESTINATION .)

@@ -27,6 +27,7 @@ set(CMAKE_SWIG_FLAGS
 swig_add_library(imgui_py
     TYPE SHARED
     LANGUAGE Python
+	OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
     OUTFILE_DIR ${CMAKE_CURRENT_BINARY_DIR}
     SOURCES
         imgui.i
@@ -50,4 +51,4 @@ target_include_directories(imgui_py PUBLIC
 target_compile_definitions(imgui_py PUBLIC -DIMGUI_USER_CONFIG="${imgui_py_SOURCE_DIR}/imconfig.h")
 
 install(TARGETS imgui_py LIBRARY DESTINATION .)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/imgui.py DESTINATION .)
+install(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/imgui.py DESTINATION .)

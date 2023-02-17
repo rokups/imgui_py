@@ -134,6 +134,11 @@ class ImRect(__ImRect__):
         assert isinstance(rhs, (float, int))
         return ImRect(self.min * rhs, self.max * rhs)
 
+    def expand(self, size):
+        if isinstance(size, float):
+            size = ImVec2(size, size)
+        return ImRect(self.min - size, self.max + size)
+
 %}
 
 %fragment("PySequenceHelpers", "header") {
