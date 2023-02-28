@@ -1,9 +1,5 @@
 find_package(SDL2 REQUIRED)
-find_package(OpenGL REQUIRED COMPONENTS OpenGL)
-find_package(SWIG REQUIRED)
-find_package(Python3 REQUIRED COMPONENTS Development NumPy)
-include(UseSWIG)
-
+find_package(OpenGL REQUIRED)
 set_property(SOURCE imgui.i PROPERTY CPLUSPLUS ON)
 set_property(SOURCE imgui.i PROPERTY INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/imgui ${CMAKE_CURRENT_SOURCE_DIR}/imgui/backends)
 set_property(SOURCE imgui.i PROPERTY COMPILE_DEFINITIONS -DIMGUI_USER_CONFIG="${imgui_py_SOURCE_DIR}/imconfig.h")
@@ -42,13 +38,14 @@ swig_add_library(imgui_py
         imgui/misc/cpp/imgui_stdlib.cpp
         DearImGuiApp.cpp
         DearImGuiApp.h)
-target_link_libraries(imgui_py PUBLIC Python3::Python OpenGL::OpenGL SDL2::SDL2)
+target_link_libraries(imgui_py PUBLIC Python3::Python OpenGL::GL SDL2::SDL2)
 target_include_directories(imgui_py PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/imgui
     ${CMAKE_CURRENT_SOURCE_DIR}/imgui/backends
 )
 target_compile_definitions(imgui_py PUBLIC -DIMGUI_USER_CONFIG="${imgui_py_SOURCE_DIR}/imconfig.h")
+target_compile_definitions(imgui_py PRIVATE -DIMGUI_BUILD=1)
 
 install(TARGETS imgui_py LIBRARY DESTINATION .)
 install(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/imgui.py DESTINATION .)

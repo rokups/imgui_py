@@ -1,6 +1,18 @@
 #pragma once
 
-// TODO: IMGUI_API for windows
+#ifdef _WIN32
+#ifdef IMGUI_BUILD
+#define IMGUI_API __declspec(dllexport)
+#else
+#define IMGUI_API __declspec(dllimport)
+#endif	// IMGUI_BUILD
+
+#ifdef IMPLOT_BUILD
+#define IMPLOT_API __declspec(dllexport)
+#else
+#define IMPLOT_API __declspec(dllimport)
+#endif	// IMGUI_BUILD
+#endif	// _WIN32
 
 #define IMGUI_DISABLE_OBSOLETE_FUNCTIONS
 #define IMGUI_DISABLE_OBSOLETE_KEYIO
