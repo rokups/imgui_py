@@ -1,10 +1,14 @@
 import multiprocessing
 import os
+import sys
 import pathlib
 import shutil
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
+
+
+CMAKE_EXTRA = []
 
 
 class CMakeExtension(Extension):
@@ -30,10 +34,14 @@ class BuildExtEx(build_ext):
         build_lib = source_dir / 'build' / 'cmake-install'
         build_temp = pathlib.Path(self.build_temp).absolute()
         build_temp.mkdir(parents=True, exist_ok=True)
-        config = 'Debug' if self.debug else 'Release'
+        config = 'Debug' if self.debug else 'RelWithDebInfo'
 
-        self.spawn(['cmake', '-S', source_dir, '-B', build_temp,
-                    f'-DCMAKE_BUILD_TYPE={config}', f'-DCMAKE_INSTALL_PREFIX={build_lib}'])
+        build_params = [
+            f'-DCMAKE_BUILD_TYPE={config}',
+            f'-DCMAKE_INSTALL_PREFIX={build_lib}',
+        ]
+
+        self.spawn(['cmake', '-S', source_dir, '-B', build_temp] + build_params + CMAKE_EXTRA)
         if not self.dry_run:
             self.spawn([
                 'cmake',
@@ -42,12 +50,17 @@ class BuildExtEx(build_ext):
                 '--parallel', f'{multiprocessing.cpu_count()}',
                 # '--target', ext.name[1:]
             ])
-            self.spawn(['cmake', '--install', build_temp])
+            self.spawn(['cmake', '--install', build_temp, '--config', config])
 
+            build_lib = build_lib / 'bin'
             lib_name = f'{ext.name}{os.path.splitext(ext_path)[1]}'
             if os.path.isfile(ext_path / lib_name):
                 os.unlink(ext_path / lib_name)
-            shutil.move(build_lib / lib_name, ext_path)
+            shutil.copy(build_lib / lib_name, ext_path)
+
+
+CMAKE_EXTRA = [arg for arg in sys.argv if arg.startswith('-D')]
+sys.argv = [arg for arg in sys.argv if not arg.startswith('-D')]
 
 
 setup(
@@ -58,7 +71,7 @@ setup(
         CMakeExtension('_implot_py'),
     ],
     py_modules=['imgui', 'implot'],
-    package_dir={'': 'build/cmake-install'},
+    package_dir={'': 'build/cmake-install/bin'},
     cmdclass={'build_ext': BuildExtEx},
     requires=['numpy']
 )

@@ -59,6 +59,11 @@ TYPEMAP_NUMPY_TYPES(double);
 %ignore ImPlot::TagXV;
 %ignore ImPlot::TagYV;
 
+%ignore ImPlot::Locator_Default;
+%ignore ImPlot::Locator_Time;
+%ignore ImPlot::Locator_Log10;
+%ignore ImPlot::Locator_SymLog;
+
 %include <carrays.i>
 %include <pybuffer.i>
 

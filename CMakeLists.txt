@@ -16,8 +16,16 @@ if (SWIG_EXECUTABLE)
 	set(SWIG_DIR "${SWIG_DIR}" CACHE STRING "" FORCE)
 endif ()
 
-find_package(SWIG REQUIRED)
+if (NOT DEFINED IMGUI_PY_INSTALL)
+	set (IMGUI_PY_INSTALL ON)
+endif ()
+
+if (ENV{VIRTUAL_ENV})
+    set(Python3_FIND_VIRTUALENV ONLY)
+endif ()
+
 find_package(Python3 REQUIRED COMPONENTS Development NumPy)
+find_package(SWIG REQUIRED)
 include(UseSWIG)
 
 add_subdirectory(imgui_py)
